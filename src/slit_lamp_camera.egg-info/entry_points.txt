@@ -1,0 +1,2 @@
+[console_scripts]
+slitcam = slit_lamp_camera.cli:main

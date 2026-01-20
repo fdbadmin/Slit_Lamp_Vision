@@ -1,0 +1,8 @@
+[Unit]
+Description=Mount USB drive %i
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/usb-mount.sh mount %i
+RemainAfterExit=yes

@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+src/slit_lamp_camera/__init__.py
+src/slit_lamp_camera/__main__.py
+src/slit_lamp_camera/camera.py
+src/slit_lamp_camera/cli.py
+src/slit_lamp_camera/gpio_io.py
+src/slit_lamp_camera/storage.py
+src/slit_lamp_camera.egg-info/PKG-INFO
+src/slit_lamp_camera.egg-info/SOURCES.txt
+src/slit_lamp_camera.egg-info/dependency_links.txt
+src/slit_lamp_camera.egg-info/entry_points.txt
+src/slit_lamp_camera.egg-info/top_level.txt

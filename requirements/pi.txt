@@ -1,0 +1,4 @@
+# Keep pip runtime deps minimal on the Pi.
+# GPIO and camera tooling should be installed via apt (see Documentation/pi-setup.md).
+
+-e .

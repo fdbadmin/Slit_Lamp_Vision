@@ -1,0 +1,24 @@
+# Slit Lamp Camera
+
+Headless video recording workflow for a slit-lamp observer-view camera using a Raspberry Pi Zero 2 W.
+
+- Project plan (extracted): Documentation/project-plan.txt
+- Phase 1 goal: reliably record a 10-second test video to a mounted USB drive
+
+## Quick start (macOS dev)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements/dev.txt
+
+# Show CLI
+python -m slit_lamp_camera --help
+```
+
+## Quick start (Pi)
+
+See:
+- Documentation/pi-setup.md
+- Documentation/deploy.md
+- Documentation/phase-1-bringup.md

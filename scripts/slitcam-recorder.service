@@ -1,0 +1,69 @@
+# Systemd service for SlitCam button-controlled recording
+#
+# This service runs the latching-button recording service at boot.
+# Press button ON to start recording, OFF to stop and convert to MP4.
+#
+# INSTALLATION:
+# -------------
+# 1. Copy this file to systemd:
+#    sudo cp slitcam-recorder.service /etc/systemd/system/
+#
+# 2. Reload systemd daemon:
+#    sudo systemctl daemon-reload
+#
+# 3. Enable service to start on boot:
+#    sudo systemctl enable slitcam-recorder.service
+#
+# 4. Start the service now:
+#    sudo systemctl start slitcam-recorder.service
+#
+# MANAGEMENT:
+# -----------
+# Check status:    sudo systemctl status slitcam-recorder.service
+# View logs:       journalctl -u slitcam-recorder.service -f
+# Stop service:    sudo systemctl stop slitcam-recorder.service
+# Disable:         sudo systemctl disable slitcam-recorder.service
+#
+# REQUIREMENTS:
+# -------------
+# - USB drive mounted (see /etc/fstab setup in README)
+# - slitcam package installed: pip install -e .
+# - Camera and button connected to GPIO17
+#
+
+[Unit]
+Description=SlitCam Button-Controlled Recording Service
+Documentation=https://github.com/yourrepo/slit-lamp-camera
+After=local-fs.target network.target
+
+[Service]
+Type=simple
+# Run as root for GPIO access
+User=root
+Group=root
+
+# Wait for USB mount to be ready
+ExecStartPre=/bin/sleep 2
+
+# Run the recording service from the venv
+ExecStart=/home/admin/.venv/bin/slitcam record-service
+
+# Graceful shutdown - sends SIGTERM which triggers clean recording stop
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Restart on failure, but not too aggressively
+Restart=on-failure
+RestartSec=5
+
+# Environment
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/home/admin
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=slitcam
+
+[Install]
+WantedBy=multi-user.target
