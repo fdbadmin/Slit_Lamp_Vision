@@ -9,6 +9,16 @@ __pycache__/
 
 .venv/
 
+# Office temp files
+~$*.docx
+~$*.pptx
+~$*.xlsx
+
+# Packaging/build artifacts
+*.egg-info/
+build/
+dist/
+
 # Local outputs
 Documentation/project-plan.txt
 Documentation/project-plan.md
