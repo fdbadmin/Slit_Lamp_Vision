@@ -3,6 +3,8 @@ from __future__ import annotations
 import signal
 import shutil
 import subprocess
+import os
+import shlex
 from pathlib import Path
 
 # Default recording parameters
@@ -27,6 +29,21 @@ def get_camera_command() -> str:
     raise RuntimeError(
         "No camera tool found. Install rpicam-apps or libcamera-apps via apt on the Pi."
     )
+
+
+def get_extra_camera_args() -> list[str]:
+    """Optional extra args passed through to rpicam-vid/libcamera-vid.
+
+    This is useful for tuning Camera Module 3 settings (e.g. autofocus, resolution)
+    without changing code.
+
+    Example:
+        SLITCAM_CAMERA_ARGS='--autofocus-mode continuous --width 1920 --height 1080'
+    """
+    raw = os.environ.get("SLITCAM_CAMERA_ARGS", "").strip()
+    if not raw:
+        return []
+    return shlex.split(raw)
 
 
 def start_recording(
@@ -57,6 +74,8 @@ def start_recording(
         "--nopreview",
         "-o", str(output_path),
     ]
+
+    args += get_extra_camera_args()
 
     proc = subprocess.Popen(
         args,
@@ -166,6 +185,8 @@ def record_h264(
         str(output_path),
     ]
 
+    cmd += get_extra_camera_args()
+
     if width is not None:
         cmd += ["--width", str(width)]
     if height is not None:
@@ -176,10 +197,14 @@ def record_h264(
     subprocess.run(cmd, check=True)
 
 
-def camera_sanity_check() -> None:
-    """Verify that a camera recording tool is available."""
+def camera_sanity_check() -> str:
+    """Verify that a camera recording tool is available.
+
+    Returns:
+        The selected camera command (e.g. "rpicam-vid" or "libcamera-vid").
+    """
     try:
-        get_camera_command()
+        return get_camera_command()
     except RuntimeError:
         raise RuntimeError(
             "No camera tool found (rpicam-vid or libcamera-vid). "

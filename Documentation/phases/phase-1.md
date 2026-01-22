@@ -44,3 +44,12 @@ Recordings are written under:
 - `/media/usb/slitlamp_recordings/`
 
 (Where `/media/usb` is a symlink to the currently inserted drive’s mountpoint.)
+
+## Camera Module 3 note (IMX708 autofocus)
+
+If you’ve upgraded to Raspberry Pi Camera Module 3, you may want to tune autofocus and/or resolution.
+You can pass additional camera args through to `rpicam-vid`/`libcamera-vid` using:
+
+- `SLITCAM_CAMERA_ARGS='--autofocus-mode continuous --width 1920 --height 1080'`
+
+This avoids needing code changes just to tweak camera parameters.

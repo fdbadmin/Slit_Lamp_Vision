@@ -36,11 +36,11 @@ def _cmd_usb_status(_: argparse.Namespace) -> int:
 
 def _cmd_camera_check(_: argparse.Namespace) -> int:
     try:
-        camera_sanity_check()
+        cmd = camera_sanity_check()
     except Exception as exc:
         print(str(exc), file=sys.stderr)
         return 1
-    print("libcamera-vid is available.")
+    print(f"{cmd} is available.")
     return 0
 
 
