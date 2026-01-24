@@ -1,12 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Bootstrap the Raspberry Pi (run ON the Pi).
-# Installs system packages + creates a venv + installs pip requirements.
+# =============================================================================
+# DEPRECATED - Use pi_setup.sh instead
+# =============================================================================
 #
-# Usage on Pi:
-#   cd ~/slit-lamp-camera
-#   ./scripts/pi_bootstrap.sh
+# This script is kept for backwards compatibility only.
+# For new installations, use:
+#
+#   ./scripts/pi_setup.sh
+#
+# Or deploy from your Mac with:
+#
+#   PI_HOST=vision.local ./scripts/deploy_rsync.sh --setup
+#
+# =============================================================================
+
+echo ""
+echo "⚠️  DEPRECATED: This script is outdated."
+echo ""
+echo "Please use the new setup script instead:"
+echo ""
+echo "  ./scripts/pi_setup.sh"
+echo ""
+echo "This provides:"
+echo "  • Complete one-command setup"
+echo "  • Automatic service installation"
+echo "  • USB automount configuration"
+echo "  • Verification checks"
+echo ""
+read -p "Continue with legacy bootstrap anyway? [y/N] " -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Run: ./scripts/pi_setup.sh"
+    exit 0
+fi
+
+echo ""
+echo "Running legacy bootstrap..."
+echo ""
 
 sudo apt update
 
@@ -32,4 +64,7 @@ python3 -m venv .venv
 python -m pip install --upgrade pip
 python -m pip install -r requirements/pi.txt
 
-echo "Bootstrap complete."
+echo ""
+echo "Legacy bootstrap complete."
+echo ""
+echo "⚠️  Note: Services NOT installed. Run ./scripts/pi_setup.sh for full setup."

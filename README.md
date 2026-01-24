@@ -59,44 +59,60 @@ The button uses internal pull-up resistor. Pressed = LOW, Released = HIGH.
 
 ### Prerequisites
 
-- Raspberry Pi OS Bookworm (64-bit Lite)
+- Raspberry Pi OS Bookworm/Trixie (64-bit Lite recommended)
 - SSH access to the Pi
 - Python 3.11+
 
-### Quick Install
+### Quick Install (One Command)
+
+From your Mac/Linux development machine:
 
 ```bash
-# On your development machine
+# Clone the repository
 git clone https://github.com/fdbadmin/Slit_Lamp_Vision.git
 cd Slit_Lamp_Vision
 
-# Deploy to Pi (assumes Pi hostname is vision.local)
-rsync -av --exclude='.git' --exclude='__pycache__' --exclude='.venv' \
-  . admin@vision.local:/home/admin/slit-lamp-camera/
-
-# SSH to Pi and run bootstrap
-ssh admin@vision.local
-cd /home/admin/slit-lamp-camera
-./scripts/pi_bootstrap.sh
+# Deploy and set up everything on the Pi (replace vision.local with your Pi's hostname)
+PI_HOST=vision.local ./scripts/deploy_rsync.sh --setup
 ```
 
-### Manual Installation (on Pi)
+This single command will:
+- Sync all code to the Pi
+- Install system packages (libcamera-apps, ffmpeg, gpiozero, etc.)
+- Create Python virtual environment
+- Install the slitcam CLI tool
+- Configure USB automount (udev rules + systemd services)
+- Enable the recording service
+- Verify camera and GPIO access
+
+After setup completes, reboot if prompted (required for GPIO group membership).
+
+### Alternative: Manual Setup
+
+If you prefer step-by-step installation:
 
 ```bash
-# Create virtual environment with system site-packages (for lgpio)
-python3 -m venv --system-site-packages ~/.venv
-source ~/.venv/bin/activate
-pip install -e /home/admin/slit-lamp-camera
+# 1. Deploy code to Pi
+PI_HOST=vision.local ./scripts/deploy_rsync.sh
 
-# Install systemd services
-sudo cp scripts/slitcam-recorder.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable slitcam-recorder.service
+# 2. SSH to Pi and run setup
+ssh admin@vision.local
+cd ~/slit-lamp-camera
+./scripts/pi_setup.sh
+```
 
-# Install USB automount
-sudo cp scripts/usb-mount.sh /usr/local/bin/
-sudo chmod +x /usr/local/bin/usb-mount.sh
-sudo cp scripts/usb-automount.rules /etc/udev/rules.d/99-usb-automount.rules
+### Uninstall
+
+To remove all slit lamp camera components:
+
+```bash
+ssh admin@vision.local
+cd ~/slit-lamp-camera
+./scripts/pi_uninstall.sh        # Remove services only
+./scripts/pi_uninstall.sh --all  # Remove everything including venv
+```
+
+See [Documentation/pi-setup.md](Documentation/pi-setup.md) for detailed setup instructions.
 
 cat << 'EOF' | sudo tee /etc/systemd/system/usb-automount.service
 [Unit]

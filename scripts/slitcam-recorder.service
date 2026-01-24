@@ -33,7 +33,7 @@
 
 [Unit]
 Description=SlitCam Button-Controlled Recording Service
-Documentation=https://github.com/yourrepo/slit-lamp-camera
+Documentation=https://github.com/fdbadmin/Slit_Lamp_Vision
 After=local-fs.target network.target
 
 [Service]
@@ -46,7 +46,7 @@ Group=root
 ExecStartPre=/bin/sleep 2
 
 # Run the recording service from the venv
-ExecStart=/home/admin/.venv/bin/slitcam record-service
+ExecStart=/home/admin/slit-lamp-camera/.venv/bin/slitcam record-service
 
 # Graceful shutdown - sends SIGTERM which triggers clean recording stop
 KillSignal=SIGTERM

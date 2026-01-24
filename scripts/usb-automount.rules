@@ -1,8 +1,8 @@
 # Udev rules for automatic USB drive mounting
-# Runs mount script directly (simpler approach)
+# Uses systemd to run mount script with full privileges
 
-# When a USB partition is added, mount it
-ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", ENV{ID_BUS}=="usb", RUN+="/usr/local/bin/usb-mount.sh mount %k"
+# When a USB partition is added, trigger systemd service
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", ENV{ID_BUS}=="usb", TAG+="systemd", ENV{SYSTEMD_WANTS}="usb-mount@%k.service"
 
 # When a USB partition is removed, stop service and unmount
 ACTION=="remove", SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/bin/systemctl stop slitcam-recorder.service", RUN+="/bin/umount -l /media/usb"

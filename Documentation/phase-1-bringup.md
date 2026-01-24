@@ -56,7 +56,7 @@ slitcam record-test --seconds 10
 ```
 
 Expected outcome:
-- A file `test_YYYYmmdd_HHMMSS.h264` exists under `<USB_MOUNT>/slitlamp-recordings/`.
+- A file `test_YYYYmmdd_HHMMSS.h264` exists under `<USB_MOUNT>/slitlamp_recordings/`.
 
 ## Notes
 

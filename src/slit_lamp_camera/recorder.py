@@ -91,7 +91,7 @@ class RecordingService:
             mp4_path = self._current_h264.with_suffix(".mp4")
             self._status(f"MP4 -> {mp4_path}")
             try:
-                convert_to_mp4(self._current_h264, delete_h264=False)
+                convert_to_mp4(self._current_h264, delete_h264=True)
             except Exception as exc:
                 self._status(f"ERROR converting to MP4: {exc}")
         self._current_h264 = None

@@ -52,7 +52,6 @@ def _flatten_lsblk(tree: dict) -> list[dict]:
 
 
 def find_usb_mount_targets(
-    recordings_dir_name: str = "slitlamp-recordings",
     prefer_label_prefixes: tuple[str, ...] = ("SLITLAMP", "SLITLAMP_"),
 ) -> list[UsbTarget]:
     """Return candidate writable mount targets for removable/USB storage.
@@ -60,14 +59,14 @@ def find_usb_mount_targets(
     Strategy:
     - Use `lsblk -J` to identify mounted partitions that look removable (RM/HOTPLUG) or USB (TRAN=usb).
     - Filter to writable mountpoints.
-    - Candidate path is <mountpoint>/<recordings_dir_name>.
+    - Returns the mount point directly; caller adds recordings subdirectory.
     """
 
     # Allow test override for macOS dev.
     override = os.environ.get("SLITCAM_STORAGE_DIR")
     if override:
         p = Path(override).expanduser()
-        return [UsbTarget(mountpoint=p / recordings_dir_name, device=None, fstype=None, label=None)]
+        return [UsbTarget(mountpoint=p, device=None, fstype=None, label=None)]
 
     try:
         tree = _run_lsblk_json()
@@ -99,11 +98,11 @@ def find_usb_mount_targets(
         if str(mp).startswith("/boot"):
             continue
 
-        target = mp / recordings_dir_name
-        if _is_writable_dir(target):
+        # Return the mount point directly; cli.py will add the recordings subdirectory
+        if _is_writable_dir(mp):
             candidates.append(
                 UsbTarget(
-                    mountpoint=target,
+                    mountpoint=mp,
                     device=n.get("path") or n.get("kname"),
                     fstype=n.get("fstype"),
                     label=n.get("label"),
