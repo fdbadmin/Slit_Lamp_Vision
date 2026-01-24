@@ -15,20 +15,34 @@ log() {
 # Clean up all stale/dead USB mounts (devices that no longer exist)
 cleanup_stale_mounts() {
     log "Cleaning up stale USB mounts..."
+    
+    # First, remove stale symlink
+    if [ -L "$SYMLINK" ]; then
+        local target=$(readlink -f "$SYMLINK" 2>/dev/null)
+        if [ ! -d "$target" ] || ! mountpoint -q "$target" 2>/dev/null; then
+            log "Removing stale symlink $SYMLINK"
+            rm -f "$SYMLINK"
+        fi
+    fi
+    
+    # Clean up all /media/usb-sd* mount points
     for mnt in /media/usb-sd*; do
         [ -d "$mnt" ] || continue
         # Extract device from mount point name
         devname=$(basename "$mnt" | sed 's/usb-//')
         device="/dev/$devname"
         
-        # If device no longer exists or mount is stale, unmount it
+        # If device no longer exists, unmount and remove
         if ! [ -b "$device" ]; then
             log "Device $device gone, cleaning up $mnt"
             umount -l "$mnt" 2>/dev/null
+            sleep 0.5
             rmdir "$mnt" 2>/dev/null
         elif mountpoint -q "$mnt" && ! ls "$mnt" >/dev/null 2>&1; then
+            # Mount exists but is stale/inaccessible
             log "Mount $mnt is stale, cleaning up"
             umount -l "$mnt" 2>/dev/null
+            sleep 0.5
             rmdir "$mnt" 2>/dev/null
         fi
     done
@@ -139,7 +153,33 @@ do_mount() {
     exit 1
 }
 
+# Unmount ALL USB drives - called on USB removal
+# Device names change between plugs (sda1→sdb1), so clean up everything
+do_unmount() {
+    log "Unmounting all USB drives..."
+    
+    # Remove the symlink first
+    if [ -L "$SYMLINK" ]; then
+        log "Removing symlink $SYMLINK"
+        rm -f "$SYMLINK"
+    fi
+    
+    # Unmount and remove ALL /media/usb-* mount points
+    for mnt in /media/usb-*; do
+        [ -d "$mnt" ] || continue
+        [ "$mnt" = "/media/usb" ] && continue  # skip symlink if it's a dir
+        
+        log "Unmounting $mnt"
+        umount -l "$mnt" 2>/dev/null
+        sleep 0.2
+        rmdir "$mnt" 2>/dev/null
+    done
+    
+    log "USB unmount complete"
+}
+
 case "$1" in
     mount) do_mount ;;
-    *) echo "Usage: $0 mount"; exit 1 ;;
+    unmount) do_unmount ;;
+    *) echo "Usage: $0 {mount|unmount}"; exit 1 ;;
 esac

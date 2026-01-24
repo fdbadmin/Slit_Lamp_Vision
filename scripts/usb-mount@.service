@@ -1,8 +1,11 @@
 [Unit]
 Description=Mount USB drive %i
 After=local-fs.target
+# Must be StopWhenUnneeded so it can be triggered again on USB replug
+StopWhenUnneeded=yes
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/usb-mount.sh mount %i
-RemainAfterExit=yes
+# RemainAfterExit=no allows service to be triggered again
+RemainAfterExit=no
