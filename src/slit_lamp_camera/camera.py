@@ -55,6 +55,8 @@ def start_recording(
         "--framerate", str(framerate),
         "--inline",  # Include SPS/PPS headers for easier conversion
         "--nopreview",
+        "--autofocus-mode", "manual",  # Disable autofocus
+        "--lens-position", "0.0",  # Focus at infinity (0 diopters)
         "-o", str(output_path),
     ]
 
